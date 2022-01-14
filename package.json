@@ -51,6 +51,7 @@
     "@types/aws-lambda": "^8.10.89",
     "@types/aws-serverless-express": "^3.3.5",
     "@types/bunyan": "^1.8.8",
+    "@types/convict": "^6.1.1",
     "@types/cookie-parser": "^1.4.2",
     "@types/fs-extra": "^9.0.13",
     "@types/helmet": "^4.0.0",

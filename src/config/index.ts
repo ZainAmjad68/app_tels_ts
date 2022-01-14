@@ -1,4 +1,4 @@
-var schema = require("./schema/schema");
+import schema = require("./schema/schema");
 
 var environmentConfig = require("./environments/" +
   schema.get("environment") +
@@ -6,4 +6,4 @@ var environmentConfig = require("./environments/" +
 
 schema.load(environmentConfig);
 schema.validate({ allowed: "strict" });
-module.exports = schema;
+export = schema;
