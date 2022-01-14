@@ -13,7 +13,6 @@ async function refreshTELSAccessToken() {
     method: "POST",
     url: url,
     data: access_token,
-    accessToken: access_token.refreshToken,
   });
   return response.accessToken;
 }
