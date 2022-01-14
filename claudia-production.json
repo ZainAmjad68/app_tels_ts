@@ -1,0 +1,10 @@
+{
+  "lambda": {
+    "role": "app_tels-executor",
+    "name": "app_tels",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "ul84b25zxj"
+  }
+}

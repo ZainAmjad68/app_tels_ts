@@ -1,0 +1,16 @@
+name: Manual Production Deployment
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    name: Manually deploy import job on Production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup
+      - name: Deploy To Production
+        uses: ./.github/actions/deploymentProduction
+        with:
+          aws-access-key-id: ${{ secrets.AWS_PRODUCTION_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_PRODUCTION_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
