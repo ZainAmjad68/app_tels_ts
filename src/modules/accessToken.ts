@@ -1,8 +1,7 @@
-const requestModule = require("./request");
-const config = require("../config");
-const urljoin = require("url-join");
-const TELSurls = require("../data/TELS_urls");
-const { method } = require("lodash");
+import requestModule = require("./request");
+import config = require("../config");
+import urljoin = require("url-join");
+import TELSurls = require("../data/TELS_urls");
 
 async function refreshTELSAccessToken() {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.OAuthUrl);
@@ -19,6 +18,6 @@ async function refreshTELSAccessToken() {
   return response.accessToken;
 }
 
-module.exports = {
+export = {
   refreshTELSAccessToken: refreshTELSAccessToken,
 };

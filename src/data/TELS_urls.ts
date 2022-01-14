@@ -1,5 +1,7 @@
-exports.facilityUrl = "customers/v1/contacts";
-exports.workOrderUrl = "workOrders/v1/workOrders";
-exports.OAuthUrl = "auth/token/refresh";
-exports.workOrderCategories = "workOrders/v1/categories";
-exports.workOrderPriorities = "workOrders/v1/priorities";
+export = {
+facilityUrl : "customers/v1/contacts",
+workOrderUrl : "workOrders/v1/workOrders",
+OAuthUrl : "auth/token/refresh",
+workOrderCategories : "workOrders/v1/categories",
+workOrderPriorities : "workOrders/v1/priorities",
+}
