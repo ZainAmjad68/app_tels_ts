@@ -33,7 +33,7 @@
     "cookie-parser": "^1.4.6",
     "ejs": "^2.6.1",
     "express": "^4.17.1",
-    "helmet": "^3.15.0",
+    "helmet": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
@@ -48,7 +48,11 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.89",
+    "@types/aws-serverless-express": "^3.3.5",
+    "@types/cookie-parser": "^1.4.2",
     "@types/fs-extra": "^9.0.13",
+    "@types/helmet": "^4.0.0",
     "@types/shelljs": "^0.8.11",
     "fs-extra": "^10.0.0",
     "nodemon": "^2.0.15",
