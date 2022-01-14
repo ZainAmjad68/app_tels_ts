@@ -1,16 +1,15 @@
-const _ = require("lodash");
-const urljoin = require("url-join");
-var AWS = require("aws-sdk");
+import _ = require("lodash");
+import urljoin = require("url-join");
+import AWS = require("aws-sdk");
 
-const requestModule = require("../modules/request");
-const config = require("../config");
-const { statuses } = require("../data/TELS_constants");
-const TELSurls = require("../data/TELS_urls");
-const { method } = require("lodash");
+import requestModule = require("../modules/request");
+import config = require("../config");
+import TELS_constants  from "../data/TELS_constants";
+import TELSurls = require("../data/TELS_urls");
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-exports.getSingleWorkOrder = async function (workOrder, access_token) {
+exports.getSingleWorkOrder = async function (workOrder : string, access_token : string) {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = `${url}/${workOrder}`;
   console.log("The URL of the Request:", url);
@@ -37,15 +36,15 @@ exports.getSingleWorkOrder = async function (workOrder, access_token) {
     "priority",
     "category",
   ]);
-  const findStatus = statuses.find(
+  const findStatus = TELS_constants.statuses.find(
     (status) => status.value === relevantData.status
   );
-  relevantData.status = findStatus.name;
+  relevantData.status = findStatus?.name;
   return relevantData;
   /*}*/
 };
 
-exports.getWorkOrderCategories = async function (access_token) {
+exports.getWorkOrderCategories = async function (access_token : string) {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderCategories);
   console.log("The URL of the Request:", url);
   let response = await requestModule.sendRequest({
@@ -56,7 +55,7 @@ exports.getWorkOrderCategories = async function (access_token) {
   return response;
 };
 
-exports.getWorkOrdersByResidentId = async function (residentId) {
+exports.getWorkOrdersByResidentId = async function (residentId : string) {
   let workOrders;
   var params = {
     TableName: config.get("app").table,
@@ -82,7 +81,7 @@ exports.getWorkOrdersByResidentId = async function (residentId) {
   return workOrders;
 };
 
-exports.putWorkOrderInDB = async function (residentId, workOrder) {
+exports.putWorkOrderInDB = async function (residentId : string, workOrder : string) {
   console.log("residentId to put in DB:", residentId);
   console.log("workOrder to put in DB:", workOrder);
   var params = {
@@ -103,7 +102,7 @@ exports.putWorkOrderInDB = async function (residentId, workOrder) {
   }
 };
 
-exports.getTELSfacilityId = async function (facilityName, access_token) {
+exports.getTELSfacilityId = async function (facilityName : string, access_token : string) {
   let url = urljoin(
     config.get("tels").baseUrl,
     TELSurls.facilityUrl,
@@ -122,7 +121,7 @@ exports.getTELSfacilityId = async function (facilityName, access_token) {
   return userFacility.businessUnitId;
 };
 
-async function getAllFacilities(accessToken) {
+async function getAllFacilities(accessToken : string) {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.facilityUrl);
 
   url = `${url}/${config.get("caremergeTELSid")}/facilities`;
@@ -138,7 +137,7 @@ async function getAllFacilities(accessToken) {
   }
 }
 
-exports.getUserFacility = async function (facilityName, accessToken) {
+exports.getUserFacility = async function (facilityName : string, accessToken : string) {
   let allFacilities = await getAllFacilities(accessToken);
   let userFacility = _.find(allFacilities, (facility) => {
     return facility.name === facilityName;
@@ -146,7 +145,7 @@ exports.getUserFacility = async function (facilityName, accessToken) {
   return userFacility.businessUnitId;
 };
 
-exports.editWorkOrder = async function (workOrder, access_token) {
+exports.editWorkOrder = async function (workOrder : any , access_token : string) { // need to change the any type
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = `${url}/${workOrder.authorizationNumber}`;
   console.log(url);
@@ -173,7 +172,7 @@ exports.editWorkOrder = async function (workOrder, access_token) {
   }
 };
 
-exports.createWorkOrder = async function (url, data, accessToken) {
+exports.createWorkOrder = async function (url : string, data : FormData, accessToken : string) {
   let response = await requestModule.sendRequest({
     method: "POST",
     url: url,
@@ -184,12 +183,12 @@ exports.createWorkOrder = async function (url, data, accessToken) {
 };
 
 exports.getResidentWorkOrdersByID = async function (
-  businessUnitId,
-  workOrderIds,
-  accessToken
+  businessUnitId : string,
+  workOrderIds : string,
+  accessToken : string
 ) {
   console.log("workOrderIds", workOrderIds);
-  let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
+  let url : string | URL = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = new URL(url);
   let searchParams = url.searchParams;
   searchParams.set("businessUnitId", businessUnitId);
@@ -222,9 +221,9 @@ exports.getResidentWorkOrdersByID = async function (
     // to convert the status id into name that the user can understand
     (workOrder) =>
       (workOrder.status = _.find(
-        statuses,
+        TELS_constants.statuses,
         (status) => status.value === workOrder.status
-      ).name)
+      )?.name)
   );
   return workOrderDetails;
 };

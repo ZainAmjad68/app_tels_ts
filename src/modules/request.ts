@@ -21,7 +21,7 @@ interface httpOpt {
 
 interface paramInterface {
   method: keyof typeof options,
-  url:string,
+  url: URL | string,
   accessToken?: string,
   data?: string | object
 }
@@ -31,7 +31,7 @@ async function sendRequest(params : paramInterface) {
     // options that are common for every request
     let httpOptions : httpOpt = {
       method: params.method,
-      uri: params.url,
+      uri: params.url.toString(),
       json: true,
     };
     let attributes = options[params.method];
