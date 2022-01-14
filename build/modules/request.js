@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const rp = require("request-promise");
+const errors_1 = require("request-promise/errors");
 let options = {
     POST: { headers: true },
     GET: { gzip: true, headers: true },
@@ -42,7 +43,7 @@ function sendRequest(params) {
             return yield rp(httpOptions);
         }
         catch (err) {
-            if (err.name === "StatusCodeError") {
+            if (err instanceof errors_1.StatusCodeError) {
                 // Not Authorized error, maybe refresh the user's auth token?
                 if (err.statusCode === 401) {
                     err.message = "Refresh Token was rejected.";
@@ -59,12 +60,12 @@ function sendRequest(params) {
                     return err;
                 }
             }
-            else if (err.name === "RequestError") {
+            else if (err instanceof errors_1.RequestError) {
                 // something went wrong in the process of making the request
                 // maybe the internet connection dropped
                 err.message = "Unable to make the request. Check Internet Connection.";
-                return err;
             }
+            return err;
         }
     });
 }

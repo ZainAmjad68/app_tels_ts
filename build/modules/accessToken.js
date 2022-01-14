@@ -12,7 +12,6 @@ const requestModule = require("./request");
 const config = require("../config");
 const urljoin = require("url-join");
 const TELSurls = require("../data/TELS_urls");
-const { method } = require("lodash");
 function refreshTELSAccessToken() {
     return __awaiter(this, void 0, void 0, function* () {
         let url = urljoin(config.get("tels").baseUrl, TELSurls.OAuthUrl);
@@ -24,7 +23,6 @@ function refreshTELSAccessToken() {
             method: "POST",
             url: url,
             data: access_token,
-            accessToken: access_token.refreshToken,
         });
         return response.accessToken;
     });

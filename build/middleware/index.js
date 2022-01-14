@@ -8,8 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 const bunyan = require("bunyan");
-const { v4: uuidv4 } = require("uuid");
+const uuid_1 = require("uuid");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
@@ -20,7 +21,7 @@ function loadLogger(req, res, next) {
         name: "tels-logger",
         req_id: _.has(req.headers, "X-Amzn-Trace-Id")
             ? req.headers["X-Amzn-Trace-Id"]
-            : uuidv4(),
+            : (0, uuid_1.v4)(),
         serializers: { err: bunyan.stdSerializers.err },
     });
     next();
