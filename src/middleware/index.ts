@@ -1,25 +1,35 @@
-const bunyan = require("bunyan");
-const { v4: uuidv4 } = require("uuid");
-const _ = require("lodash");
-const jwt = require("jsonwebtoken");
-const config = require("../config");
+import bunyan = require("bunyan");
+import { v4 } from "uuid";
+import _ = require("lodash");
+import jwt = require("jsonwebtoken");
+import config = require("../config");
+import { Request, Response, NextFunction } from 'express';
+import accessTokenModule = require("../modules/accessToken");
+import Logger = require("bunyan");
 
-const accessTokenModule = require("../modules/accessToken");
+let accessToken: string;
 
-let accessToken;
+declare module "express" { 
+  export interface Request {
+    log: Logger,
+    residentId : string,
+    businessUnitId : string,
+    accessToken: string,
+  }
+}
 
-function loadLogger(req, res, next) {
+function loadLogger(req: Request, res: Response, next: NextFunction) {
   req.log = bunyan.createLogger({
     name: "tels-logger",
     req_id: _.has(req.headers, "X-Amzn-Trace-Id")
       ? req.headers["X-Amzn-Trace-Id"]
-      : uuidv4(),
+      : v4(),
     serializers: { err: bunyan.stdSerializers.err },
   });
   next();
 }
 
-function verifyJWTtoken(req, res, next) {
+function verifyJWTtoken(req: Request, res: Response, next: NextFunction) {
   try {
     let token = req.query.token
       ? req.query.token
@@ -42,7 +52,7 @@ function verifyJWTtoken(req, res, next) {
   }
 }
 
-async function attachTokenToRequest(req, res, next) {
+async function attachTokenToRequest(req: Request, res: Response, next: NextFunction) {
   if (!accessToken) {
     accessToken = await accessTokenModule.refreshTELSAccessToken();
   }
