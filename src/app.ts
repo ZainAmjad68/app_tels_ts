@@ -3,6 +3,7 @@ import awsServerlessExpressMiddleware = require("aws-serverless-express/middlewa
 import helmet = require("helmet");
 import bodyParser = require("body-parser");
 import cookieParser = require("cookie-parser");
+import path = require("path");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(helmet());
 const routes = require("./routes");
 app.use("/api", routes);
 
+app.set( "views", path.join( __dirname, "views" ) );
 app.set("view engine", "ejs");
 
 app.use("/public", express.static(__dirname + "/public"));
