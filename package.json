@@ -15,7 +15,7 @@
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts,ejs,png,css --exec npm run dev:start",
     "start": "node .",
-    "release:automated": "npm run build && claudia create --handler build/lambda.handler --deploy-proxy-api",
+    "release:automated": "npm run build && claudia create --handler build/lambda.handler --deploy-proxy-api --region us-east-1",
     "release:automated:production": "npm run build && claudia --config claudia-production.json update"
   },
   "keywords": [],
