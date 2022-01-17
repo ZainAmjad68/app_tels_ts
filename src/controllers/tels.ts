@@ -1,7 +1,7 @@
 import _ = require("lodash");
 import urljoin = require("url-join");
 
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 import requestModule = require("../modules/request");
 import config = require("../config");
@@ -9,24 +9,29 @@ import TELS from "../modules/tels";
 import { categories, priorities } from "../data/TELS_constants";
 import TELSurls = require("../data/TELS_urls");
 import { StatusCodeError } from "request-promise/errors";
+import { DynamoDB } from "aws-sdk";
+
+interface workOrder {
+  authorizationNumber : string,
+  title : string,
+  description : string,
+  createdWhen : string,
+  whereLocated : string,
+  status : string,
+  priority : string,
+  category : string,
+}
 
 exports.init = async function (req : Request, res : Response) {
   try {
-    let businessUnitId, residentId;
-    if (req.businessUnitId && req.residentId) {
-      ({ businessUnitId, residentId } = req);
-    } else {
-      businessUnitId = "138266";
-      residentId = "1234";
-    }
+    let { businessUnitId, residentId } = req;
+
     console.log("residentId", residentId);
     console.log("businessUnitId", businessUnitId);
     let workOrders;
 
     let DBresponse = await TELS.getWorkOrdersByResidentId(residentId);
-    if (DBresponse && DBresponse.stack && DBresponse.message) {
-      throw DBresponse;
-    }
+
     // won't reach here if the returned value is an error
     workOrders = DBresponse;
     req.log.info({ workOrders });
@@ -35,13 +40,6 @@ exports.init = async function (req : Request, res : Response) {
       workOrders,
       req.accessToken
     );
-    if (
-      workOrderDetails &&
-      workOrderDetails.stack &&
-      workOrderDetails.message
-    ) {
-      throw workOrderDetails;
-    }
     res.cookie("token", req.query.token, {
       maxAge: 1000*60*30,  // 30 min
       httpOnly: true,
@@ -73,7 +71,7 @@ exports.getWorkOrders = async function (req : Request, res : Response) {
     let workOrders =
       req?.apiGateway?.event?.multiValueQueryStringParameters?.workOrders;
     req.log.info({ workOrders }, "query WorkOrders");
-    let workOrderDetails = await Promise.all(
+    let workOrderDetails : workOrder[] = await Promise.all(
       _.map(workOrders, async (workOrder) => {
         return TELS.getSingleWorkOrder(workOrder, req.accessToken);
       })
@@ -81,12 +79,7 @@ exports.getWorkOrders = async function (req : Request, res : Response) {
     let responseStatus = 200;
     req.log.info(workOrderDetails);
     workOrderDetails.forEach((workOrder) => {
-      if (
-        workOrder &&
-        workOrder.stack &&
-        workOrder.message &&
-        workOrder.statusCode === 404
-      ) {
+      if (workOrder instanceof StatusCodeError) {
         responseStatus = 422;
       }
     });

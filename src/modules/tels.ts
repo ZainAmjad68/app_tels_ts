@@ -9,7 +9,19 @@ import TELSurls = require("../data/TELS_urls");
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-const getSingleWorkOrder = async function (workOrder : string, access_token : string) {
+interface workOrder {
+  authorizationNumber : string,
+  title : string,
+  description : string,
+  createdWhen : string,
+  whereLocated : string,
+  status : string,
+  priority : string,
+  category : string,
+}
+
+
+const getSingleWorkOrder = async function (workOrder : string, access_token : string) : Promise<workOrder> {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = `${url}/${workOrder}`;
   console.log("The URL of the Request:", url);
@@ -24,7 +36,7 @@ const getSingleWorkOrder = async function (workOrder : string, access_token : st
       throw response;
     }
   } catch (err) {
-    return err;
+    throw err;
   }
   let relevantData = _.pick(response, [
     "authorizationNumber",
@@ -55,7 +67,7 @@ const getWorkOrderCategories = async function (access_token : string) {
   return response;
 };
 
-const getWorkOrdersByResidentId = async function (residentId : string) {
+const getWorkOrdersByResidentId = async function (residentId : string) : Promise<string[]> {
   let workOrders;
   var params = {
     TableName: config.get("app").table,
@@ -76,7 +88,8 @@ const getWorkOrdersByResidentId = async function (residentId : string) {
     workOrders = _.map(result.Items, "workOrder");
   } catch (err) {
     console.log("Query to Database Failed.");
-    return err;
+    console.log(err);
+    throw err;
   }
   return workOrders;
 };
@@ -184,9 +197,9 @@ const createWorkOrder = async function (url : string, data : FormData, accessTok
 
 const getResidentWorkOrdersByID = async function (
   businessUnitId : string,
-  workOrderIds : string,
+  workOrderIds : string[],
   accessToken : string
-) {
+) : Promise<object[]> {
   console.log("workOrderIds", workOrderIds);
   let url : string | URL = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = new URL(url);
@@ -208,7 +221,7 @@ const getResidentWorkOrdersByID = async function (
     response.nextPageKey = nextPageData.nextPageKey;
   }
   if (response && response.stack && response.message) {
-    return response;
+    throw response;
   }
   const workOrderDetails = _.map(workOrderIds, (id) =>
     _.find(
