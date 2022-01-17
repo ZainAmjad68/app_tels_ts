@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.priorities = exports.statuses = exports.categories = void 0;
 exports.categories = [
     {
         id: 17,
@@ -72,8 +74,7 @@ exports.categories = [
         id: 9,
         name: "Vehicle Repair",
     },
-];
-exports.statuses = [
+], exports.statuses = [
     {
         name: "Open",
         value: 1,
@@ -90,8 +91,7 @@ exports.statuses = [
         name: "Cancelled",
         value: 9,
     },
-];
-exports.priorities = [
+], exports.priorities = [
     {
         name: "Critical",
         value: 1,

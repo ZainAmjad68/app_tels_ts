@@ -8,40 +8,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const urljoin = require("url-join");
 const requestModule = require("../modules/request");
 const config = require("../config");
-const TELS = require("../modules/tels");
-const { categories, priorities } = require("../data/TELS_constants");
+const tels_1 = __importDefault(require("../modules/tels"));
+const TELS_constants_1 = require("../data/TELS_constants");
 const TELSurls = require("../data/TELS_urls");
+const errors_1 = require("request-promise/errors");
 exports.init = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let businessUnitId, residentId;
-            if (req.businessUnitId && req.residentId) {
-                ({ businessUnitId, residentId } = req);
-            }
-            else {
-                businessUnitId = "138266";
-                residentId = "1234";
-            }
+            let { businessUnitId, residentId } = req;
             console.log("residentId", residentId);
             console.log("businessUnitId", businessUnitId);
             let workOrders;
-            let DBresponse = yield TELS.getWorkOrdersByResidentId(residentId);
-            if (DBresponse && DBresponse.stack && DBresponse.message) {
-                throw DBresponse;
-            }
+            let DBresponse = yield tels_1.default.getWorkOrdersByResidentId(residentId);
             // won't reach here if the returned value is an error
             workOrders = DBresponse;
             req.log.info({ workOrders });
-            let workOrderDetails = yield TELS.getResidentWorkOrdersByID(businessUnitId, workOrders, req.accessToken);
-            if (workOrderDetails &&
-                workOrderDetails.stack &&
-                workOrderDetails.message) {
-                throw workOrderDetails;
-            }
+            let workOrderDetails = yield tels_1.default.getResidentWorkOrdersByID(businessUnitId, workOrders, req.accessToken);
             res.cookie("token", req.query.token, {
                 maxAge: 1000 * 60 * 30,
                 httpOnly: true,
@@ -51,8 +41,8 @@ exports.init = function (req, res) {
             res.removeHeader("X-Frame-Options");
             res.render("pages/index", {
                 workOrderDetails,
-                categories,
-                priorities,
+                categories: TELS_constants_1.categories,
+                priorities: TELS_constants_1.priorities,
                 businessUnitId,
                 residentId,
             });
@@ -60,26 +50,29 @@ exports.init = function (req, res) {
         catch (err) {
             req.log.info("Error: failed to load the Tels main endpoint");
             req.log.info({ err: err });
-            res.status(err.statusCode || 500).send(err.message);
+            if (err instanceof errors_1.StatusCodeError) {
+                res.status(err.statusCode || 500).send(err.message);
+            }
+            else if (err instanceof Error) {
+                res.send(err);
+            }
         }
     });
 };
 exports.getWorkOrders = function (req, res) {
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // req.query can't handle array query parameters as its not supported by aws-serverless-express, so getting the array parameters directly from event
-            let workOrders = req.apiGateway.event.multiValueQueryStringParameters.workOrders;
+            let workOrders = (_c = (_b = (_a = req === null || req === void 0 ? void 0 : req.apiGateway) === null || _a === void 0 ? void 0 : _a.event) === null || _b === void 0 ? void 0 : _b.multiValueQueryStringParameters) === null || _c === void 0 ? void 0 : _c.workOrders;
             req.log.info({ workOrders }, "query WorkOrders");
             let workOrderDetails = yield Promise.all(_.map(workOrders, (workOrder) => __awaiter(this, void 0, void 0, function* () {
-                return TELS.getSingleWorkOrder(workOrder, req.accessToken);
+                return tels_1.default.getSingleWorkOrder(workOrder, req.accessToken);
             })));
             let responseStatus = 200;
             req.log.info(workOrderDetails);
             workOrderDetails.forEach((workOrder) => {
-                if (workOrder &&
-                    workOrder.stack &&
-                    workOrder.message &&
-                    workOrder.statusCode === 404) {
+                if (workOrder instanceof errors_1.StatusCodeError) {
                     responseStatus = 422;
                 }
             });
@@ -88,7 +81,12 @@ exports.getWorkOrders = function (req, res) {
         catch (err) {
             req.log.info("Error: failed to get the work orders:");
             req.log.info({ err: err });
-            res.status(err.statusCode).send(err.message);
+            if (err instanceof errors_1.StatusCodeError) {
+                res.status(err.statusCode || 500).send(err.message);
+            }
+            else if (err instanceof Error) {
+                res.send(err);
+            }
         }
     });
 };
@@ -140,7 +138,12 @@ exports.getFacilityWorkOrdersByID = function (req, res) {
         catch (err) {
             req.log.info("Error: failed to get work orders for entire facility using IDs");
             req.log.info({ err: err });
-            res.status(err.statusCode).send(err.message);
+            if (err instanceof errors_1.StatusCodeError) {
+                res.status(err.statusCode || 500).send(err.message);
+            }
+            else if (err instanceof Error) {
+                res.send(err);
+            }
         }
     });
 };
@@ -152,19 +155,24 @@ exports.createWorkOrder = function (req, res) {
             req.log.info("Create Work Order Request Query Parameters:", req.query);
             let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
             req.body.facilityId = req.businessUnitId;
-            let response = yield TELS.createWorkOrder(url, req.body, req.accessToken);
+            let response = yield tels_1.default.createWorkOrder(url, req.body, req.accessToken);
             if (response && response.stack && response.message) {
                 throw response;
             }
             req.log.info("Work Order successfully created in TELS.");
             let workOrder = response.entityIdentifier;
-            yield TELS.putWorkOrderInDB(req.residentId, workOrder);
+            yield tels_1.default.putWorkOrderInDB(req.residentId, workOrder);
             res.status(200).json(response);
         }
         catch (err) {
             req.log.info("Error: failed to create the work order");
             req.log.info({ err: err });
-            res.status(err.statusCode || 500).send(err.message);
+            if (err instanceof errors_1.StatusCodeError) {
+                res.status(err.statusCode || 500).send(err.message);
+            }
+            else if (err instanceof Error) {
+                res.send(err);
+            }
         }
     });
 };
@@ -173,7 +181,7 @@ exports.editWorkOrder = function (req, res) {
         try {
             let workOrders = req.body;
             req.log.info({ body: req.body }, "Request Body:");
-            const responseStatus = yield TELS.editWorkOrder(workOrders, req.accessToken);
+            const responseStatus = yield tels_1.default.editWorkOrder(workOrders, req.accessToken);
             if (responseStatus && responseStatus.stack && responseStatus.message) {
                 throw responseStatus;
             }
@@ -183,7 +191,12 @@ exports.editWorkOrder = function (req, res) {
         catch (err) {
             req.log.info("Error: failed to edit the work order");
             req.log.info({ err: err });
-            res.status(err.statusCode || 500).send(err.message);
+            if (err instanceof errors_1.StatusCodeError) {
+                res.status(err.statusCode || 500).send(err.message);
+            }
+            else if (err instanceof Error) {
+                res.send(err);
+            }
         }
     });
 };

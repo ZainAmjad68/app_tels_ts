@@ -25,7 +25,7 @@ function sendRequest(params) {
             // options that are common for every request
             let httpOptions = {
                 method: params.method,
-                uri: params.url,
+                uri: params.url.toString(),
                 json: true,
             };
             let attributes = options[params.method];
