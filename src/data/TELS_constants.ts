@@ -1,5 +1,5 @@
-export = {
-  categories : [
+export const
+  categories = [
     {
       id: 17,
       name: "Administrative",
@@ -73,7 +73,7 @@ export = {
       name: "Vehicle Repair",
     },
   ],
-  statuses : [
+  statuses = [
     {
       name: "Open",
       value: 1,
@@ -91,7 +91,7 @@ export = {
       value: 9,
     },
   ],
-  priorities : [
+  priorities = [
     {
       name: "Critical",
       value: 1,
@@ -109,4 +109,3 @@ export = {
       value: 3,
     },
   ]
-}
