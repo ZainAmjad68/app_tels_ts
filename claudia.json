@@ -1,0 +1,11 @@
+{
+    "lambda": {
+      "role": "app_tels_ts-executor",
+      "name": "app_tels_ts",
+      "region": "***"
+    },
+    "api": {
+      "id": "8j36rfzcrg",
+      "url": "https://8j36rfzcrg.execute-api.***.amazonaws.com/latest"
+    }
+  }
