@@ -60,8 +60,8 @@ async function attachTokenToRequest(req: Request, res: Response, next: NextFunct
   next();
 }
 
-module.exports = {
-  loadLogger: loadLogger,
-  attachTokenToRequest: attachTokenToRequest,
-  verifyJWTtoken: verifyJWTtoken,
-};
+export {
+  loadLogger,
+  attachTokenToRequest,
+  verifyJWTtoken,
+}

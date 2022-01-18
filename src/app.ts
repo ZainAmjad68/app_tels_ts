@@ -1,11 +1,12 @@
 import express = require("express");
+import { Express } from 'express';
 import awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 import helmet = require("helmet");
 import bodyParser = require("body-parser");
 import cookieParser = require("cookie-parser");
 import path = require("path");
 
-const app = express();
+const app : Express = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
