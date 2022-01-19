@@ -22,6 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/shelljs": "^0.8.11",
     "aws-sdk": "^2.1035.0",
     "aws-serverless-express": "^3.4.0",
     "body-parser": "^1.18.3",
@@ -38,7 +39,6 @@
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.34",
-    "parsleyjs": "^2.9.2",
     "path": "^0.12.7",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
@@ -59,7 +59,6 @@
     "@types/lodash": "^4.14.178",
     "@types/node": "^17.0.8",
     "@types/request-promise": "^4.1.48",
-    "@types/shelljs": "^0.8.11",
     "@types/url-join": "^4.0.1",
     "@types/uuid": "^8.3.4",
     "fs-extra": "^10.0.0",
