@@ -20,7 +20,7 @@ const tels_1 = __importDefault(require("../modules/tels"));
 const TELS_constants_1 = require("../data/TELS_constants");
 const TELSurls = require("../data/TELS_urls");
 const errors_1 = require("request-promise/errors");
-exports.init = function (req, res) {
+const init = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let { businessUnitId, residentId } = req;
@@ -59,7 +59,7 @@ exports.init = function (req, res) {
         }
     });
 };
-exports.getWorkOrders = function (req, res) {
+const getWorkOrders = function (req, res) {
     var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -90,7 +90,7 @@ exports.getWorkOrders = function (req, res) {
         }
     });
 };
-exports.getFacilityWorkOrdersByID = function (req, res) {
+const getFacilityWorkOrdersByID = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // the facility id of TELS is provided in the req.query here, currently there's only one but will be many more in future
@@ -147,7 +147,7 @@ exports.getFacilityWorkOrdersByID = function (req, res) {
         }
     });
 };
-exports.createWorkOrder = function (req, res) {
+const createWorkOrder = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // req.body has form data that is used to create the work order
@@ -176,7 +176,7 @@ exports.createWorkOrder = function (req, res) {
         }
     });
 };
-exports.editWorkOrder = function (req, res) {
+const editWorkOrder = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let workOrders = req.body;
@@ -199,4 +199,11 @@ exports.editWorkOrder = function (req, res) {
             }
         }
     });
+};
+exports.default = {
+    init,
+    getWorkOrders,
+    getFacilityWorkOrdersByID,
+    createWorkOrder,
+    editWorkOrder,
 };

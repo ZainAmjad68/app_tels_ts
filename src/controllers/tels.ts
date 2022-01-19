@@ -9,7 +9,6 @@ import TELS from "../modules/tels";
 import { categories, priorities } from "../data/TELS_constants";
 import TELSurls = require("../data/TELS_urls");
 import { StatusCodeError } from "request-promise/errors";
-import { DynamoDB } from "aws-sdk";
 
 interface workOrder {
   authorizationNumber : string,
@@ -22,7 +21,7 @@ interface workOrder {
   category : string,
 }
 
-exports.init = async function (req : Request, res : Response) {
+const init = async function (req : Request, res : Response) {
   try {
     let { businessUnitId, residentId } = req;
 
@@ -65,7 +64,7 @@ exports.init = async function (req : Request, res : Response) {
   }
 };
 
-exports.getWorkOrders = async function (req : Request, res : Response) {
+const getWorkOrders = async function (req : Request, res : Response) {
   try {
     // req.query can't handle array query parameters as its not supported by aws-serverless-express, so getting the array parameters directly from event
     let workOrders =
@@ -95,7 +94,7 @@ exports.getWorkOrders = async function (req : Request, res : Response) {
   }
 };
 
-exports.getFacilityWorkOrdersByID = async function (req : Request, res : Response) {
+const getFacilityWorkOrdersByID = async function (req : Request, res : Response) {
   try {
     // the facility id of TELS is provided in the req.query here, currently there's only one but will be many more in future
     let url : string | URL = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
@@ -151,7 +150,7 @@ exports.getFacilityWorkOrdersByID = async function (req : Request, res : Respons
   }
 };
 
-exports.createWorkOrder = async function (req : Request, res : Response) {
+const createWorkOrder = async function (req : Request, res : Response) {
   try {
     // req.body has form data that is used to create the work order
     req.log.info("Create Work Order Request Body:", req.body);
@@ -177,7 +176,7 @@ exports.createWorkOrder = async function (req : Request, res : Response) {
   }
 };
 
-exports.editWorkOrder = async function (req : Request, res : Response) {
+const editWorkOrder = async function (req : Request, res : Response) {
   try {
     let workOrders = req.body;
     req.log.info({ body: req.body }, "Request Body:");
@@ -200,3 +199,12 @@ exports.editWorkOrder = async function (req : Request, res : Response) {
     }
   }
 };
+
+
+export default {
+  init,
+  getWorkOrders,
+  getFacilityWorkOrdersByID,
+  createWorkOrder,
+  editWorkOrder,
+}
