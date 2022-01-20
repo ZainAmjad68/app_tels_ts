@@ -4,14 +4,16 @@ const awsServerlessExpressMiddleware = require("aws-serverless-express/middlewar
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(awsServerlessExpressMiddleware.eventContext());
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 const routes = require("./routes");
 app.use("/api", routes);
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use("/public", express.static(__dirname + "/public"));
 module.exports = app;

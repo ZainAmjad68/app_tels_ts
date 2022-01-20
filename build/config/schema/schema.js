@@ -1,5 +1,5 @@
 "use strict";
-var convict = require("convict");
+const convict = require("convict");
 module.exports = convict({
     environment: {
         doc: "Specifies the running environment of tels-integration-api",

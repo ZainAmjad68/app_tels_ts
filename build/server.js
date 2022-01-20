@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const config = require("./config/index");
 const app = require("./app");
 const port = config.get("Port") || 8080;

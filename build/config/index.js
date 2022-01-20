@@ -1,5 +1,5 @@
 "use strict";
-var schema = require("./schema/schema");
+const schema = require("./schema/schema");
 var environmentConfig = require("./environments/" +
     schema.get("environment") +
     ".json");

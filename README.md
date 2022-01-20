@@ -1,16 +1,61 @@
-# app_tels
-IN-1283
+The following steps capture everything I needed to do before I could start converting files from JS to TS one by one.
 
+- Make two folders, `src` and `build`. Copy/Paste all the old project files into the src folder. Take out the `package.json` and any other non-JS configuration related files (.github folder, .gitignore, claudia, webpack, gulp files etc.) into the root directory
+- Install TypeScript by executing `npm install typescript`. And use `tsc --init` command to build a tsconfig.json file.
+    * `tsconfig.json` should have the input and output directories defined, allow JS to be processed initially, and include the target version of JS. All in all, these options should be present in the file:
+    ```json
+    {
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es5"
+    },
+    "include": ["./src/**/*"]
+    }
+    ```
+- At this point, running `tsc` would look for any files with `.ts` or `.js` (because of allowJs) extension and transpile them into the build folder. But it doesn't process other files like html, ejs or css in our project.
+- There are two ways to handle what happens with non-JS files that aren't transpiled by the TS compiler itself:
+    * using build tools like webpack or gulp to handle these files for you
+        - There's an official [guide](https://www.typescriptlang.org/docs/handbook/migrating-from-javascript.html#integrating-with-build-tools) for this that you can refer to.
+    * build re-usable custom logic for projects not integrating build tools
+        - This method use libraries [ts-node](https://www.npmjs.com/package/ts-node), [shelljs](https://www.npmjs.com/package/shelljs), [nodemon](https://www.npmjs.com/package/nodemon), [rimraf](https://www.npmjs.com/package/rimraf), and [npm-run-all](https://www.npmjs.com/package/npm-run-all)
+        - Install all the above mentioned packages and their type definitions
+        - Make a folder named tools and a file named copy-assets.ts in it. Use the file to copy assets (views folder etc.) from src to build using the shelljs module.
+            ```javascript
+            import * as shell from "shelljs";
 
+            // Copy all the view templates
+            shell.cp("-R", "src/views", "build/");
 
+            // add commands for any other stuff to copy over
+            ```
+        - Add these scripts to `package.json`:
+            ```javascript
+            "scripts": {    // remove comments if you copy this as json doesn't support comments
+                "clean": "rimraf build/*",  // deletes everything from build
+                "tsc": "tsc",   // transpiles typescript to javascript
+                "copy-assets": "ts-node tools/copyAssets",  // copies relevant assets from src to build
+                "build": "npm-run-all clean tsc copy-assets",   // runs all of the above mentioned scripts with a single command
+                "start": "node .",  // command to run dev server
+                "dev:start": "npm-run-all build start",    // transpiles and then starts the dev server
+                "dev": "nodemon --watch src -e ts,ejs,png,css --exec npm run dev:start",    // starts the dev server in watch mode
+            }
+            ```
+- In the package.json, change the main entering point of the app and also specify the files property to only include build folder files.
+```json
+  "main": "build/index.js",
+  "files": [
+    "build/**/*.*",
+    "package.json"
+  ]
+```
 
-# Deployment
+---------------------------------------------------------------------------------------------------------------------------------
 
-Steps for Production (already done):
+***You are now ready to convert your first JS file into TS.*** 
 
-Create the Lambda function: (delete the claudia.json file before) `claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1`
-This will return the URL that can be used to access the API
-Define the `AWS_PRODUCTION_ACCESS_KEY_ID` and `AWS_PRODUCTION_SECRET_ACCESS_KEY` on GitHub secrets.
-Still need to manually deploy on Production upon any change using `npm run release:automated:production`
-Create the DynamoDB table: `aws dynamodb create-table --cli-input-json file://create-table-workorders.json --region us-east-1`
-Don't need to define access key and secret as they are automatically put in env variables and picked up by the AWS SDK when making calls to DynamoDB
+Choose any file (try to start with smaller files and go in the same flow as your application would go [i.e.; for an express application: index.js -> router -> middleware -> handler]) that you would like to convert and change its extension to `.ts`. Deal with any error that might arise. And after you're satisfied, run `npm run build`. It should transpile the typescript code and give you the desired result.
+
+Repeat the process until all the files in the project are converted to TS. If possible, run the project after every conversion, it would make it easier to catch any errors made by you during the converion and will help to isolate the cause of failure to that single recently converted file. 
+
+---------------------------------------------------------------------------------------------------------------------------------

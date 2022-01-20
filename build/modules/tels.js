@@ -8,16 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const urljoin = require("url-join");
-var AWS = require("aws-sdk");
+const AWS = require("aws-sdk");
 const requestModule = require("../modules/request");
 const config = require("../config");
-const { statuses } = require("../data/TELS_constants");
+const TELS_constants_1 = require("../data/TELS_constants");
 const TELSurls = require("../data/TELS_urls");
-const { method } = require("lodash");
 var docClient = new AWS.DynamoDB.DocumentClient();
-exports.getSingleWorkOrder = function (workOrder, access_token) {
+const getSingleWorkOrder = function (workOrder, access_token) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
         url = `${url}/${workOrder}`;
@@ -34,7 +34,7 @@ exports.getSingleWorkOrder = function (workOrder, access_token) {
             }
         }
         catch (err) {
-            return err;
+            throw err;
         }
         let relevantData = _.pick(response, [
             "authorizationNumber",
@@ -46,13 +46,13 @@ exports.getSingleWorkOrder = function (workOrder, access_token) {
             "priority",
             "category",
         ]);
-        const findStatus = statuses.find((status) => status.value === relevantData.status);
-        relevantData.status = findStatus.name;
+        const findStatus = TELS_constants_1.statuses.find((status) => status.value === relevantData.status);
+        relevantData.status = findStatus === null || findStatus === void 0 ? void 0 : findStatus.name;
         return relevantData;
         /*}*/
     });
 };
-exports.getWorkOrderCategories = function (access_token) {
+const getWorkOrderCategories = function (access_token) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderCategories);
         console.log("The URL of the Request:", url);
@@ -64,7 +64,7 @@ exports.getWorkOrderCategories = function (access_token) {
         return response;
     });
 };
-exports.getWorkOrdersByResidentId = function (residentId) {
+const getWorkOrdersByResidentId = function (residentId) {
     return __awaiter(this, void 0, void 0, function* () {
         let workOrders;
         var params = {
@@ -86,12 +86,13 @@ exports.getWorkOrdersByResidentId = function (residentId) {
         }
         catch (err) {
             console.log("Query to Database Failed.");
-            return err;
+            console.log(err);
+            throw err;
         }
         return workOrders;
     });
 };
-exports.putWorkOrderInDB = function (residentId, workOrder) {
+const putWorkOrderInDB = function (residentId, workOrder) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("residentId to put in DB:", residentId);
         console.log("workOrder to put in DB:", workOrder);
@@ -114,7 +115,7 @@ exports.putWorkOrderInDB = function (residentId, workOrder) {
         }
     });
 };
-exports.getTELSfacilityId = function (facilityName, access_token) {
+const getTELSfacilityId = function (facilityName, access_token) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = urljoin(config.get("tels").baseUrl, TELSurls.facilityUrl, config.get("caremergeTELSid"), "facilities");
         console.log("The URL of the Request:", url);
@@ -144,7 +145,7 @@ function getAllFacilities(accessToken) {
         }
     });
 }
-exports.getUserFacility = function (facilityName, accessToken) {
+const getUserFacility = function (facilityName, accessToken) {
     return __awaiter(this, void 0, void 0, function* () {
         let allFacilities = yield getAllFacilities(accessToken);
         let userFacility = _.find(allFacilities, (facility) => {
@@ -153,7 +154,7 @@ exports.getUserFacility = function (facilityName, accessToken) {
         return userFacility.businessUnitId;
     });
 };
-exports.editWorkOrder = function (workOrder, access_token) {
+const editWorkOrder = function (workOrder, access_token) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
         url = `${url}/${workOrder.authorizationNumber}`;
@@ -181,7 +182,7 @@ exports.editWorkOrder = function (workOrder, access_token) {
         }
     });
 };
-exports.createWorkOrder = function (url, data, accessToken) {
+const createWorkOrder = function (url, data, accessToken) {
     return __awaiter(this, void 0, void 0, function* () {
         let response = yield requestModule.sendRequest({
             method: "POST",
@@ -192,7 +193,7 @@ exports.createWorkOrder = function (url, data, accessToken) {
         return response;
     });
 };
-exports.getResidentWorkOrdersByID = function (businessUnitId, workOrderIds, accessToken) {
+const getResidentWorkOrdersByID = function (businessUnitId, workOrderIds, accessToken) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("workOrderIds", workOrderIds);
         let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
@@ -215,13 +216,27 @@ exports.getResidentWorkOrdersByID = function (businessUnitId, workOrderIds, acce
             response.nextPageKey = nextPageData.nextPageKey;
         }
         if (response && response.stack && response.message) {
-            return response;
+            throw response;
         }
         const workOrderDetails = _.map(workOrderIds, (id) => _.find(response.workOrders, (workOrder) => workOrder.authorizationNumber === id));
         console.log("workOrderDetails", workOrderDetails);
         workOrderDetails.forEach(
         // to convert the status id into name that the user can understand
-        (workOrder) => (workOrder.status = _.find(statuses, (status) => status.value === workOrder.status).name));
+        (workOrder) => {
+            var _a;
+            return (workOrder.status = (_a = _.find(TELS_constants_1.statuses, (status) => status.value === workOrder.status)) === null || _a === void 0 ? void 0 : _a.name);
+        });
         return workOrderDetails;
     });
+};
+exports.default = {
+    getSingleWorkOrder,
+    getWorkOrderCategories,
+    getWorkOrdersByResidentId,
+    putWorkOrderInDB,
+    getTELSfacilityId,
+    getUserFacility,
+    editWorkOrder,
+    createWorkOrder,
+    getResidentWorkOrdersByID,
 };

@@ -1,29 +1,36 @@
-const _ = require("lodash");
-const urljoin = require("url-join");
+import _ = require("lodash");
+import urljoin = require("url-join");
 
-const requestModule = require("../modules/request");
-const config = require("../config");
-const TELS = require("../modules/tels");
-const { categories, priorities } = require("../data/TELS_constants");
-const TELSurls = require("../data/TELS_urls");
+import { Request, Response } from 'express';
 
-exports.init = async function (req, res) {
+import requestModule = require("../modules/request");
+import config = require("../config");
+import TELS from "../modules/tels";
+import { categories, priorities } from "../data/TELS_constants";
+import TELSurls = require("../data/TELS_urls");
+import { StatusCodeError } from "request-promise/errors";
+
+interface workOrder {
+  authorizationNumber : string,
+  title : string,
+  description : string,
+  createdWhen : string,
+  whereLocated : string,
+  status : string,
+  priority : string,
+  category : string,
+}
+
+const init = async function (req : Request, res : Response) {
   try {
-    let businessUnitId, residentId;
-    if (req.businessUnitId && req.residentId) {
-      ({ businessUnitId, residentId } = req);
-    } else {
-      businessUnitId = "138266";
-      residentId = "1234";
-    }
+    let { businessUnitId, residentId } = req;
+
     console.log("residentId", residentId);
     console.log("businessUnitId", businessUnitId);
     let workOrders;
 
     let DBresponse = await TELS.getWorkOrdersByResidentId(residentId);
-    if (DBresponse && DBresponse.stack && DBresponse.message) {
-      throw DBresponse;
-    }
+
     // won't reach here if the returned value is an error
     workOrders = DBresponse;
     req.log.info({ workOrders });
@@ -32,13 +39,6 @@ exports.init = async function (req, res) {
       workOrders,
       req.accessToken
     );
-    if (
-      workOrderDetails &&
-      workOrderDetails.stack &&
-      workOrderDetails.message
-    ) {
-      throw workOrderDetails;
-    }
     res.cookie("token", req.query.token, {
       maxAge: 1000*60*30,  // 30 min
       httpOnly: true,
@@ -56,17 +56,21 @@ exports.init = async function (req, res) {
   } catch (err) {
     req.log.info("Error: failed to load the Tels main endpoint");
     req.log.info({ err: err });
-    res.status(err.statusCode || 500).send(err.message);
+    if (err instanceof StatusCodeError) {
+      res.status(err.statusCode || 500).send(err.message);
+      } else if (err instanceof Error) {
+        res.send(err);
+      }
   }
 };
 
-exports.getWorkOrders = async function (req, res) {
+const getWorkOrders = async function (req : Request, res : Response) {
   try {
     // req.query can't handle array query parameters as its not supported by aws-serverless-express, so getting the array parameters directly from event
     let workOrders =
-      req.apiGateway.event.multiValueQueryStringParameters.workOrders;
+      req?.apiGateway?.event?.multiValueQueryStringParameters?.workOrders;
     req.log.info({ workOrders }, "query WorkOrders");
-    let workOrderDetails = await Promise.all(
+    let workOrderDetails : workOrder[] = await Promise.all(
       _.map(workOrders, async (workOrder) => {
         return TELS.getSingleWorkOrder(workOrder, req.accessToken);
       })
@@ -74,12 +78,7 @@ exports.getWorkOrders = async function (req, res) {
     let responseStatus = 200;
     req.log.info(workOrderDetails);
     workOrderDetails.forEach((workOrder) => {
-      if (
-        workOrder &&
-        workOrder.stack &&
-        workOrder.message &&
-        workOrder.statusCode === 404
-      ) {
+      if (workOrder instanceof StatusCodeError) {
         responseStatus = 422;
       }
     });
@@ -87,18 +86,22 @@ exports.getWorkOrders = async function (req, res) {
   } catch (err) {
     req.log.info("Error: failed to get the work orders:");
     req.log.info({ err: err });
-    res.status(err.statusCode).send(err.message);
+    if (err instanceof StatusCodeError) {
+      res.status(err.statusCode || 500).send(err.message);
+      } else if (err instanceof Error) {
+        res.send(err);
+      }
   }
 };
 
-exports.getFacilityWorkOrdersByID = async function (req, res) {
+const getFacilityWorkOrdersByID = async function (req : Request, res : Response) {
   try {
     // the facility id of TELS is provided in the req.query here, currently there's only one but will be many more in future
-    let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
+    let url : string | URL = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
     url = new URL(url);
     let searchParams = url.searchParams;
     for (var property in req.query) {
-      searchParams.set(property, req.query[property]);
+      searchParams.set(property, req.query[property] as string);
     }
     let response = await requestModule.sendRequest({
       method: "GET",
@@ -139,11 +142,15 @@ exports.getFacilityWorkOrdersByID = async function (req, res) {
       "Error: failed to get work orders for entire facility using IDs"
     );
     req.log.info({ err: err });
-    res.status(err.statusCode).send(err.message);
+    if (err instanceof StatusCodeError) {
+      res.status(err.statusCode || 500).send(err.message);
+      } else if (err instanceof Error) {
+        res.send(err);
+      }
   }
 };
 
-exports.createWorkOrder = async function (req, res) {
+const createWorkOrder = async function (req : Request, res : Response) {
   try {
     // req.body has form data that is used to create the work order
     req.log.info("Create Work Order Request Body:", req.body);
@@ -161,11 +168,15 @@ exports.createWorkOrder = async function (req, res) {
   } catch (err) {
     req.log.info("Error: failed to create the work order");
     req.log.info({ err: err });
-    res.status(err.statusCode || 500).send(err.message);
+    if (err instanceof StatusCodeError) {
+      res.status(err.statusCode || 500).send(err.message);
+      } else if (err instanceof Error) {
+        res.send(err);
+      }
   }
 };
 
-exports.editWorkOrder = async function (req, res) {
+const editWorkOrder = async function (req : Request, res : Response) {
   try {
     let workOrders = req.body;
     req.log.info({ body: req.body }, "Request Body:");
@@ -181,6 +192,19 @@ exports.editWorkOrder = async function (req, res) {
   } catch (err) {
     req.log.info("Error: failed to edit the work order");
     req.log.info({ err: err });
+    if (err instanceof StatusCodeError) {
     res.status(err.statusCode || 500).send(err.message);
+    } else if (err instanceof Error) {
+      res.send(err);
+    }
   }
 };
+
+
+export default {
+  init,
+  getWorkOrders,
+  getFacilityWorkOrdersByID,
+  createWorkOrder,
+  editWorkOrder,
+}

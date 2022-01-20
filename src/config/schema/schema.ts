@@ -1,6 +1,6 @@
-var convict = require("convict");
+import convict = require("convict");
 
-module.exports = convict({
+export = convict({
   environment: {
     doc: "Specifies the running environment of tels-integration-api",
     format: String,
