@@ -1,6 +1,6 @@
 The following steps capture everything I needed to do before I could start converting files from JS to TS one by one.
 
-- Make two folders, `src` and `build`. Copy/Paste all the old project files into the src folder. Take out the `package.json` and any other non-JS configuration related files (.github folder, .gitignore, claudia webpack, gulp files etc.) into the root directory
+- Make two folders, `src` and `build`. Copy/Paste all the old project files into the src folder. Take out the `package.json` and any other non-JS configuration related files (.github folder, .gitignore, claudia, webpack, gulp files etc.) into the root directory
 - Install TypeScript by executing `npm install typescript`. And use `tsc --init` command to build a tsconfig.json file.
     * `tsconfig.json` should have the input and output directories defined, allow JS to be processed initially, and include the target version of JS. All in all, these options should be present in the file:
     ```json
@@ -54,7 +54,7 @@ The following steps capture everything I needed to do before I could start conve
 
 ***You are now ready to convert your first JS file into TS.*** 
 
-Choose any file (try to start with smaller files and go in the same flow as your application would go [i.e.; for an express application: index.js -> router -> middleware -> handler]) that you would like to convert and change its extension to `.ts`. Deal with any error that might arise - the guide below sheds some light on some common errors that you might encounter. And after you're satisfied, run `npm run build`. It should transpile the typescript code and give you the desired result.
+Choose any file (try to start with smaller files and go in the same flow as your application would go [i.e.; for an express application: index.js -> router -> middleware -> handler]) that you would like to convert and change its extension to `.ts`. Deal with any error that might arise. And after you're satisfied, run `npm run build`. It should transpile the typescript code and give you the desired result.
 
 Repeat the process until all the files in the project are converted to TS. If possible, run the project after every conversion, it would make it easier to catch any errors made by you during the converion and will help to isolate the cause of failure to that single recently converted file. 
 
