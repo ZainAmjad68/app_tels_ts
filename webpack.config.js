@@ -33,4 +33,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
   ],
   target: 'node',
   externals: [nodeExternals()],
+  node: {
+    __dirname: true
+  }  
 };

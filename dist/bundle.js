@@ -114,7 +114,7 @@ app.set("view engine", "ejs");
 app.use("/public", express.static(__dirname + "/public"));
 module.exports = app;
 
-/* WEBPACK VAR INJECTION */}.call(this, "/"))
+/* WEBPACK VAR INJECTION */}.call(this, "src"))
 
 /***/ }),
 
@@ -264,7 +264,7 @@ module.exports = convict({
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__dirname) {
+
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -305,7 +305,6 @@ const init = function (req, res) {
                 secure: true
             });
             res.removeHeader("X-Frame-Options");
-            console.log('Current Directory: ', __dirname);
             res.render("pages/index", {
                 workOrderDetails,
                 categories: TELS_constants_1.categories,
@@ -475,7 +474,6 @@ exports.default = {
     editWorkOrder,
 };
 
-/* WEBPACK VAR INJECTION */}.call(this, "/"))
 
 /***/ }),
 
@@ -848,7 +846,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _ = __webpack_require__(/*! lodash */ "lodash");
 const urljoin = __webpack_require__(/*! url-join */ "url-join");
 const AWS = __webpack_require__(/*! aws-sdk */ "aws-sdk");
-AWS.config.update({ region: 'us-east-1' });
+AWS.config.update({ region: "us-east-1" });
 const requestModule = __webpack_require__(/*! ../modules/request */ "./src/modules/request.ts");
 const config = __webpack_require__(/*! ../config */ "./src/config/index.ts");
 const TELS_constants_1 = __webpack_require__(/*! ../data/TELS_constants */ "./src/data/TELS_constants.ts");
