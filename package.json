@@ -11,11 +11,12 @@
     "start": "node .",
     "gulp": "gulp",
     "webpack": "webpack",
-    "build": "npm run webpack",
-    "dev:start": "npm-run-all build start",
+    "build:webpack": "npm run webpack",
+    "build:gulp": "npm run webpack",
+    "dev:start": "npm-run-all build:gulp start",
     "dev": "nodemon --watch src -e ts,ejs,png,css --exec npm run dev:start",
-    "release:automated": "npm run build && claudia --config claudia.json update",
-    "release:automated:production": "npm run build && claudia --config claudia.json update"
+    "release:automated": "npm run build:webpack && claudia --config claudia.json update",
+    "release:automated:production": "npm run build:webpack && claudia --config claudia.json update"
   },
   "keywords": [],
   "author": "",
