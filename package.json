@@ -2,7 +2,7 @@
   "name": "app_tels_ts",
   "version": "1.0.0",
   "description": "IN-1511",
-  "main": "build/app.js",
+  "main": "dist/bundle.js",
   "files": [
     "build/**/*.*",
     "package.json"
