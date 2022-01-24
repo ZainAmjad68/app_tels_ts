@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node .",
     "gulp": "gulp",
-    "build": "npm run gulp",
+    "webpack": "webpack",
+    "build": "npm run webpack",
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts,ejs,png,css --exec npm run dev:start",
     "release:automated": "npm run build && claudia --config claudia.json update",

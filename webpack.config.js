@@ -27,7 +27,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
       patterns: [
         { from: 'src/views', to: 'views' },
         { from: 'src/public', to: 'public' },
-        { from: 'src/config/environments', to: 'config/environments' }
       ],
     }),
   ],
