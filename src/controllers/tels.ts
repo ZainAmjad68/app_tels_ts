@@ -10,16 +10,7 @@ import { categories, priorities } from "../data/TELS_constants";
 import TELSurls = require("../data/TELS_urls");
 import { StatusCodeError } from "request-promise/errors";
 
-interface workOrder {
-  authorizationNumber : string,
-  title : string,
-  description : string,
-  createdWhen : string,
-  whereLocated : string,
-  status : string,
-  priority : string,
-  category : string,
-}
+import { workOrder, workOrderOptional } from "../types";
 
 const init = async function (req : Request, res : Response) {
   try {
@@ -178,7 +169,7 @@ const createWorkOrder = async function (req : Request, res : Response) {
 
 const editWorkOrder = async function (req : Request, res : Response) {
   try {
-    let workOrders = req.body;
+    let workOrders : workOrderOptional = req.body;
     req.log.info({ body: req.body }, "Request Body:");
     const responseStatus = await TELS.editWorkOrder(
       workOrders,

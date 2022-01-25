@@ -8,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendRequest = exports.options = void 0;
 const rp = require("request-promise");
 const errors_1 = require("request-promise/errors");
-let options = {
+exports.options = {
     POST: { headers: true },
     GET: { gzip: true, headers: true },
     PATCH: {
@@ -28,7 +30,7 @@ function sendRequest(params) {
                 uri: params.url.toString(),
                 json: true,
             };
-            let attributes = options[params.method];
+            let attributes = exports.options[params.method];
             // append options that are different for each request type
             Object.assign(httpOptions, attributes);
             if (httpOptions["headers"] !== undefined) {
@@ -69,6 +71,4 @@ function sendRequest(params) {
         }
     });
 }
-module.exports = {
-    sendRequest: sendRequest,
-};
+exports.sendRequest = sendRequest;

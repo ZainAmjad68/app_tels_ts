@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(awsServerlessExpressMiddleware.eventContext());
 app.use(helmet({contentSecurityPolicy: false}));
 
-const routes = require("./routes");
+import routes = require("./routes");
 app.use("/api", routes);
 
 app.set( "views", path.join( __dirname, "views" ) );
