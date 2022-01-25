@@ -756,9 +756,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendRequest = exports.options = void 0;
 const rp = __webpack_require__(/*! request-promise */ "request-promise");
 const errors_1 = __webpack_require__(/*! request-promise/errors */ "request-promise/errors");
-let options = {
+exports.options = {
     POST: { headers: true },
     GET: { gzip: true, headers: true },
     PATCH: {
@@ -776,7 +778,7 @@ function sendRequest(params) {
                 uri: params.url.toString(),
                 json: true,
             };
-            let attributes = options[params.method];
+            let attributes = exports.options[params.method];
             // append options that are different for each request type
             Object.assign(httpOptions, attributes);
             if (httpOptions["headers"] !== undefined) {
@@ -817,9 +819,7 @@ function sendRequest(params) {
         }
     });
 }
-module.exports = {
-    sendRequest: sendRequest,
-};
+exports.sendRequest = sendRequest;
 
 
 /***/ }),
@@ -846,7 +846,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const _ = __webpack_require__(/*! lodash */ "lodash");
 const urljoin = __webpack_require__(/*! url-join */ "url-join");
 const AWS = __webpack_require__(/*! aws-sdk */ "aws-sdk");
-AWS.config.update({ region: "us-east-1" });
 const requestModule = __webpack_require__(/*! ../modules/request */ "./src/modules/request.ts");
 const config = __webpack_require__(/*! ../config */ "./src/config/index.ts");
 const TELS_constants_1 = __webpack_require__(/*! ../data/TELS_constants */ "./src/data/TELS_constants.ts");

@@ -7,19 +7,9 @@ import config = require("../config");
 import {statuses} from "../data/TELS_constants";
 import TELSurls = require("../data/TELS_urls");
 
+import { workOrder, workOrderOptional } from "../types";
+
 var docClient = new AWS.DynamoDB.DocumentClient();
-
-interface workOrder {
-  authorizationNumber : string,
-  title : string,
-  description : string,
-  createdWhen : string,
-  whereLocated : string,
-  status : string,
-  priority : string,
-  category : string,
-}
-
 
 const getSingleWorkOrder = async function (workOrder : string, access_token : string) : Promise<workOrder> {
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
@@ -158,7 +148,7 @@ const getUserFacility = async function (facilityName : string, accessToken : str
   return userFacility.businessUnitId;
 };
 
-const editWorkOrder = async function (workOrder : any , access_token : string) { // need to change the any type
+const editWorkOrder = async function (workOrder : workOrderOptional , access_token : string) { // need to change the any type
   let url = urljoin(config.get("tels").baseUrl, TELSurls.workOrderUrl);
   url = `${url}/${workOrder.authorizationNumber}`;
   console.log(url);
@@ -167,7 +157,7 @@ const editWorkOrder = async function (workOrder : any , access_token : string) {
   let data = [];
   for (var params of Object.keys(workOrder)) {
     data.push({
-      value: workOrder[params],
+      value: workOrder[params as keyof workOrderOptional],
       path: params,
       op: "replace",
     });

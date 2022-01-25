@@ -1,7 +1,9 @@
 import rp = require("request-promise");
 import { RequestError, StatusCodeError } from "request-promise/errors";
 
-let options = {
+import { httpOpt, paramInterface } from "../types";
+
+export let options = {
   POST: { headers: true },
   GET: { gzip: true, headers: true },
   PATCH: {
@@ -11,22 +13,7 @@ let options = {
   SIMPLEPOST: {},
 };
 
-interface httpOpt {
-  method: "POST" | "GET" | "PATCH" | "SIMPLEPOST",
-  uri: string,
-  json: boolean,
-  headers?: object,
-  body?: string | object
-}
-
-interface paramInterface {
-  method: keyof typeof options,
-  url: URL | string,
-  accessToken?: string,
-  data?: string | object
-}
-
-async function sendRequest(params : paramInterface) {
+export async function sendRequest(params : paramInterface) {
   try {
     // options that are common for every request
     let httpOptions : httpOpt = {
@@ -72,6 +59,3 @@ async function sendRequest(params : paramInterface) {
   }
 }
 
-export = {
-  sendRequest: sendRequest,
-};

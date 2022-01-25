@@ -12,7 +12,7 @@
     "gulp": "gulp",
     "webpack": "webpack",
     "build:webpack": "npm run webpack",
-    "build:gulp": "npm run webpack",
+    "build:gulp": "npm run gulp",
     "dev:start": "npm-run-all build:gulp start",
     "dev": "nodemon --watch src -e ts,ejs,png,css --exec npm run dev:start",
     "release:automated": "npm run build:webpack && claudia --config claudia.json update",
